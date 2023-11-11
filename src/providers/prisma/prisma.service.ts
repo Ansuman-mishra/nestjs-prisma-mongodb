@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   OnModuleInit,
+  OnModuleDestroy,
   Optional,
 } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
@@ -16,7 +17,7 @@ export class PrismaService
     Prisma.PrismaClientOptions,
     'query' | 'info' | 'warn' | 'error'
   >
-  implements OnModuleInit
+  implements OnModuleInit, OnModuleDestroy
 {
   constructor(
     @Optional()
@@ -38,9 +39,7 @@ export class PrismaService
     }
   }
 
-  async enableShutdownHooks(app: INestApplication | INestMicroservice) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
+  async onModuleDestroy() {
+    await this.$disconnect;
   }
 }
